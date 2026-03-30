@@ -1,0 +1,130 @@
+{
+  "dns": {
+    "hosts": {
+      "geosite:category-ads-all": "127.0.0.1"
+    },
+    "servers": [
+      {
+        "address": "https://1.1.1.1/dns-query",
+        "domains": [
+          "geosite:geolocation-!cn"
+        ],
+        "expectedIPs": [
+          "geoip:!cn"
+        ]
+      },
+      {
+        "address": "https://1.0.0.1/dns-query",
+        "domains": [
+          "geosite:geolocation-!cn"
+        ],
+        "expectedIPs": [
+          "geoip:!cn"
+        ]
+      },
+      {
+        "address": "223.5.5.5",
+        "domains": [
+          "geosite:cn",
+          "geosite:apple-cn",
+          "geosite:google-cn",
+          "geosite:category-games@cn"
+        ],
+        "expectedIPs": [
+          "geoip:cn",
+          "geoip:hk",
+          "geoip:mo"
+        ],
+        "skipFallback": true
+      },
+      {
+        "address": "119.29.29.29",
+        "domains": [
+          "geosite:cn",
+          "geosite:apple-cn",
+          "geosite:google-cn",
+          "geosite:category-games@cn"
+        ],
+        "expectedIPs": [
+          "geoip:cn",
+          "geoip:hk",
+          "geoip:mo"
+        ],
+        "skipFallback": true
+      }
+    ]
+  },
+  "routing": {
+    "domainStrategy": "IPIfNonMatch",
+    "rules": [
+      {
+        "type": "field",
+        "ruleTag": "block-ads",
+        "domain": [
+          "geosite:category-ads-all"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "ruleTag": "block-bittorrent",
+        "protocol": [
+          "bittorrent"
+        ],
+        "outboundTag": "block"
+      },
+      {
+        "type": "field",
+        "ruleTag": "direct-private-domains",
+        "domain": [
+          "geosite:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ruleTag": "direct-cn-domains",
+        "domain": [
+          "geosite:apple-cn",
+          "geosite:google-cn",
+          "geosite:tld-cn",
+          "geosite:category-games@cn",
+          "geosite:cn"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ruleTag": "proxy-non-cn-domains",
+        "domain": [
+          "geosite:geolocation-!cn"
+        ],
+        "outboundTag": "proxy"
+      },
+      {
+        "type": "field",
+        "ruleTag": "direct-private-ip",
+        "ip": [
+          "geoip:private"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ruleTag": "direct-cn-hk-mo-ip",
+        "ip": [
+          "geoip:cn",
+          "geoip:hk",
+          "geoip:mo"
+        ],
+        "outboundTag": "direct"
+      },
+      {
+        "type": "field",
+        "ruleTag": "proxy-catch-all",
+        "network": "tcp,udp",
+        "outboundTag": "proxy"
+      }
+    ]
+  }
+}
