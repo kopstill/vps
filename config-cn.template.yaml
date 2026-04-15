@@ -7,8 +7,7 @@
 
 # --- 基础设置 ---
 mixed-port: 7890
-allow-lan: true
-bind-address: "*"
+allow-lan: false
 mode: rule
 log-level: info
 ipv6: false
@@ -17,9 +16,9 @@ tcp-concurrent: true
 find-process-mode: strict
 
 # --- GeoData 设置 ---
-# 注意: geodata 在 Mihomo 启动时下载（先于代理启动），大陆首次启动时
-# raw.githubusercontent.com 可能无法直连。如首次启动失败，可先手动下载
-# 放到 ~/.config/clash/ 目录，或临时切换到镜像站
+# 注意: geodata 在 Mihomo 启动时下载 (先于代理启动)。为保证大陆首次启动
+# 可直连，geox-url 和 rule-providers 统一使用 testingcf.jsdelivr.net 镜像。
+# 如镜像偶发不可用，可先手动下载 .dat 文件放到 ~/.config/clash/ 目录
 geodata-mode: true
 geo-auto-update: true
 geo-update-interval: 24
@@ -32,7 +31,7 @@ geox-url:
 # 大陆需要分流 DNS: 国内域名用国内 DNS，国外域名走加密 DNS
 dns:
   enable: true
-  listen: 0.0.0.0:1053
+  listen: 127.0.0.1:1053
   enhanced-mode: fake-ip
   fake-ip-range: 198.18.0.1/16
   fake-ip-filter:
@@ -77,6 +76,24 @@ dns:
     "geosite:cn,private":
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
+
+# --- Sniffer 流量嗅探 ---
+# 在 fake-ip 模式下从 TLS SNI / HTTP Host / QUIC 中提取真实域名,
+# 让 DOMAIN-SUFFIX / GEOSITE 规则能准确命中 HTTPS 流量
+sniffer:
+  enable: true
+  force-dns-mapping: true
+  parse-pure-ip: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443]
+  skip-domain:
+    - "Mijia Cloud"
+    - "+.push.apple.com"
 
 # ==============================================================
 # 代理节点 (模板)
@@ -169,84 +186,84 @@ rule-providers:
   reject:
     type: http
     behavior: domain
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/reject.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/reject.txt"
     path: ./ruleset/reject.yaml
     interval: 86400
 
   private:
     type: http
     behavior: domain
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/private.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/private.txt"
     path: ./ruleset/private.yaml
     interval: 86400
 
   direct:
     type: http
     behavior: domain
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/direct.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
     path: ./ruleset/direct.yaml
     interval: 86400
 
   proxy:
     type: http
     behavior: domain
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/proxy.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
     path: ./ruleset/proxy.yaml
     interval: 86400
 
   gfw:
     type: http
     behavior: domain
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/gfw.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
     path: ./ruleset/gfw.yaml
     interval: 86400
 
   tld-not-cn:
     type: http
     behavior: domain
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/tld-not-cn.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
     path: ./ruleset/tld-not-cn.yaml
     interval: 86400
 
   cncidr:
     type: http
     behavior: ipcidr
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/cncidr.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
     path: ./ruleset/cncidr.yaml
     interval: 86400
 
   lancidr:
     type: http
     behavior: ipcidr
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/lancidr.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/lancidr.txt"
     path: ./ruleset/lancidr.yaml
     interval: 86400
 
   applications:
     type: http
     behavior: classical
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/applications.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/applications.txt"
     path: ./ruleset/applications.yaml
     interval: 86400
 
   icloud:
     type: http
     behavior: domain
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/icloud.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
     path: ./ruleset/icloud.yaml
     interval: 86400
 
   apple:
     type: http
     behavior: domain
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/apple.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
     path: ./ruleset/apple.yaml
     interval: 86400
 
   telegramcidr:
     type: http
     behavior: ipcidr
-    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/telegramcidr.txt"
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
     path: ./ruleset/telegramcidr.yaml
     interval: 86400
 
