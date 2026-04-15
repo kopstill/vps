@@ -157,6 +157,27 @@ rule-providers:
     path: ./ruleset/applications.yaml
     interval: 86400
 
+  icloud:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/icloud.txt"
+    path: ./ruleset/icloud.yaml
+    interval: 86400
+
+  apple:
+    type: http
+    behavior: domain
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/apple.txt"
+    path: ./ruleset/apple.yaml
+    interval: 86400
+
+  telegramcidr:
+    type: http
+    behavior: ipcidr
+    url: "https://raw.githubusercontent.com/Loyalsoldier/clash-rules/release/telegramcidr.txt"
+    path: ./ruleset/telegramcidr.yaml
+    interval: 86400
+
 # ==============================================================
 # 分流规则
 # 香港默认直连，仅 AI 走代理；其他服务需要代理时通过 PROXY 组手动切换
@@ -170,46 +191,27 @@ rules:
   # --- 广告拦截 ---
   - RULE-SET,reject,REJECT
 
-  # --- 自定义补丁: AI 服务 (必须走代理) ---
-  - DOMAIN-SUFFIX,openai.com,AI
-  - DOMAIN-SUFFIX,chatgpt.com,AI
-  - DOMAIN-SUFFIX,oaistatic.com,AI
-  - DOMAIN-SUFFIX,oaiusercontent.com,AI
-  - DOMAIN-SUFFIX,anthropic.com,AI
-  - DOMAIN-SUFFIX,claude.ai,AI
-  - DOMAIN-SUFFIX,claudeusercontent.com,AI
-  - DOMAIN-SUFFIX,gemini.google.com,AI
-  - DOMAIN-SUFFIX,bard.google.com,AI
-  - DOMAIN-SUFFIX,aistudio.google.com,AI
-  - DOMAIN-SUFFIX,generativelanguage.googleapis.com,AI
-  - DOMAIN-SUFFIX,deepmind.google,AI
-  - DOMAIN-SUFFIX,copilot.microsoft.com,AI
-  - DOMAIN-SUFFIX,perplexity.ai,AI
-  - DOMAIN-SUFFIX,poe.com,AI
-  - DOMAIN-SUFFIX,character.ai,AI
-  - DOMAIN-SUFFIX,x.ai,AI
-  - DOMAIN-SUFFIX,grok.com,AI
-  - DOMAIN-SUFFIX,suno.com,AI
+  # --- AI 服务 (HK IP 被 OpenAI/Claude/Gemini 等屏蔽，必须走美国) ---
+  # geosite category-ai-!cn 已覆盖: OpenAI/Claude/Gemini/Copilot/Perplexity/
+  # Grok/Huggingface/ElevenLabs/Poe/Cursor/Codeium/Cohere/Mistral/Groq 等
+  - GEOSITE,category-ai-!cn,AI
+  # 兜底: geosite 未收录的图像/音频/角色生成 AI
   - DOMAIN-SUFFIX,midjourney.com,AI
+  - DOMAIN-SUFFIX,suno.com,AI
   - DOMAIN-SUFFIX,stability.ai,AI
-  - DOMAIN-SUFFIX,huggingface.co,AI
   - DOMAIN-SUFFIX,replicate.com,AI
   - DOMAIN-SUFFIX,runwayml.com,AI
-  - DOMAIN-SUFFIX,elevenlabs.io,AI
-  - DOMAIN-KEYWORD,openai,AI
+  - DOMAIN-SUFFIX,character.ai,AI
 
-  # --- 自定义补丁: TikTok (香港/大陆 IP 均被屏蔽) ---
-  - DOMAIN-SUFFIX,tiktok.com,PROXY
-  - DOMAIN-SUFFIX,tiktokcdn.com,PROXY
-  - DOMAIN-SUFFIX,tiktokcdn-us.com,PROXY
-  - DOMAIN-SUFFIX,tiktokv.com,PROXY
-  - DOMAIN-SUFFIX,tiktokd.org,PROXY
-  - DOMAIN-SUFFIX,musical.ly,PROXY
-  - DOMAIN-SUFFIX,muscdn.com,PROXY
-  - DOMAIN-SUFFIX,byteoversea.com,PROXY
-  - DOMAIN-SUFFIX,ibytedtos.com,PROXY
-  - DOMAIN-SUFFIX,ipstatp.com,PROXY
-  - DOMAIN-KEYWORD,tiktok,PROXY
+  # --- TikTok (香港/大陆 IP 均被屏蔽) ---
+  - GEOSITE,tiktok,PROXY
+
+  # --- Apple/iCloud 直连 (HK 默认就是直连，显式声明以便统一管理) ---
+  - RULE-SET,icloud,DIRECT
+  - RULE-SET,apple,DIRECT
+
+  # --- Telegram 直连 (HK 可直连 Telegram，无需走代理) ---
+  - RULE-SET,telegramcidr,DIRECT,no-resolve
 
   # --- 国内直连 ---
   - RULE-SET,direct,DIRECT
