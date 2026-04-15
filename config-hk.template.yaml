@@ -15,7 +15,6 @@ ipv6: false
 unified-delay: true
 tcp-concurrent: true
 find-process-mode: strict
-global-client-fingerprint: chrome
 
 # --- GeoData 设置 ---
 geodata-mode: true
@@ -25,10 +24,6 @@ geox-url:
   geoip: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geoip.dat"
   geosite: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/geosite.dat"
   mmdb: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/release/country.mmdb"
-
-# --- TLS 指纹 ---
-tls:
-  fingerprint: chrome
 
 # --- DNS 配置 ---
 # 香港网络无污染，DNS 配置较简单

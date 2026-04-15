@@ -15,7 +15,6 @@ ipv6: false
 unified-delay: true
 tcp-concurrent: true
 find-process-mode: strict
-global-client-fingerprint: chrome
 
 # --- GeoData 设置 ---
 # 注意: geodata 在 Mihomo 启动时下载（先于代理启动），大陆首次启动时
@@ -28,10 +27,6 @@ geox-url:
   geoip: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geoip.dat"
   geosite: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/geosite.dat"
   mmdb: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
-
-# --- TLS 指纹 ---
-tls:
-  fingerprint: chrome
 
 # --- DNS 配置 ---
 # 大陆需要分流 DNS: 国内域名用国内 DNS，国外域名走加密 DNS
