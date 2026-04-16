@@ -132,20 +132,6 @@ rule-providers:
     path: ./ruleset/private.yaml
     interval: 86400
 
-  direct:
-    type: http
-    behavior: domain
-    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
-    path: ./ruleset/direct.yaml
-    interval: 86400
-
-  cncidr:
-    type: http
-    behavior: ipcidr
-    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/cncidr.txt"
-    path: ./ruleset/cncidr.yaml
-    interval: 86400
-
   lancidr:
     type: http
     behavior: ipcidr
@@ -160,35 +146,12 @@ rule-providers:
     path: ./ruleset/applications.yaml
     interval: 86400
 
-  icloud:
-    type: http
-    behavior: domain
-    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/icloud.txt"
-    path: ./ruleset/icloud.yaml
-    interval: 86400
-
-  apple:
-    type: http
-    behavior: domain
-    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/apple.txt"
-    path: ./ruleset/apple.yaml
-    interval: 86400
-
-  telegramcidr:
-    type: http
-    behavior: ipcidr
-    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/telegramcidr.txt"
-    path: ./ruleset/telegramcidr.yaml
-    interval: 86400
-
 # ==============================================================
 # 分流规则
-# 香港默认直连，仅 AI/TikTok 走代理
-# 注: PROXY 组实际上只被 TikTok 规则使用,在 GUI 中切换 PROXY 组的节点
-#     只会影响 TikTok 的出口；AI 走独立的 AI 组 (AUTO-US)
+# 黑名单模式: 仅 AI/TikTok 走代理，其余全部直连
 # ==============================================================
 rules:
-  # --- 局域网/私有网络 ---
+  # --- 局域网/私有网络 (保护性规则，防止被 reject/AI 误匹配) ---
   - RULE-SET,private,DIRECT
   - RULE-SET,lancidr,DIRECT,no-resolve
   - RULE-SET,applications,DIRECT
@@ -211,19 +174,5 @@ rules:
   # --- TikTok (香港/大陆 IP 均被屏蔽) ---
   - GEOSITE,tiktok,PROXY
 
-  # --- Apple/iCloud 直连 (HK 默认就是直连，显式声明以便统一管理) ---
-  - RULE-SET,icloud,DIRECT
-  - RULE-SET,apple,DIRECT
-
-  # --- Telegram 直连 (HK 可直连 Telegram，无需走代理) ---
-  - RULE-SET,telegramcidr,DIRECT,no-resolve
-
-  # --- 国内直连 ---
-  - RULE-SET,direct,DIRECT
-  - RULE-SET,cncidr,DIRECT,no-resolve
-
-  # --- GeoIP 兜底 ---
-  - GEOIP,CN,DIRECT
-
-  # --- 最终规则: 默认直连 (黑名单模式) ---
+  # --- 默认直连 (黑名单模式) ---
   - MATCH,DIRECT
