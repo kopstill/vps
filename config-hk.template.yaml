@@ -82,79 +82,37 @@ sniffer:
 #   3. config-hk.yaml 已在 .gitignore 中，不会被提交
 # ==============================================================
 proxies:
-  - name: "USA"
-    type: ss
-    server: YOUR_USA_SERVER
-    port: YOUR_USA_PORT
-    cipher: chacha20-ietf-poly1305
-    password: "YOUR_USA_PASSWORD"
-    udp: true
-    plugin: v2ray-plugin
-    plugin-opts:
-      mode: websocket
-      mux: 0
-  - name: "USD"
+  - name: "EXAMPLE"
     type: vless
-    server: YOUR_USD_SERVER
+    server: YOUR_SERVER
     port: 443
-    uuid: YOUR_USD_UUID
+    uuid: YOUR_UUID
     network: tcp
     tls: true
     udp: true
     flow: xtls-rprx-vision
-    servername: YOUR_USD_SNI
+    servername: YOUR_SNI
     reality-opts:
-      public-key: YOUR_USD_PUBLIC_KEY
-      short-id: YOUR_USD_SHORT_ID
+      public-key: YOUR_PUBLIC_KEY
+      short-id: YOUR_SHORT_ID
     client-fingerprint: chrome
-  - name: "KOR"
-    type: ss
-    server: YOUR_KOR_SERVER
-    port: YOUR_KOR_PORT
-    cipher: chacha20-ietf-poly1305
-    password: "YOUR_KOR_PASSWORD"
-    udp: true
 
 # ==============================================================
 # 策略组
+# 按需添加更多节点到 proxies 列表和策略组中
 # ==============================================================
 proxy-groups:
   # 主代理出口 (手动切换)
   - name: PROXY
     type: select
     proxies:
-      - USD
-      - USA
-      - KOR
-      - AUTO
-  # 自动选择最快节点 (含全部出口)
-  - name: AUTO
-    type: url-test
-    proxies:
-      - USD
-      - USA
-      - KOR
-    url: "http://www.gstatic.com/generate_204"
-    interval: 300
-    tolerance: 50
-
-  # 仅美国节点的自动选择 (供 AI 使用，避免落到 KOR 被拒)
-  - name: AUTO-US
-    type: url-test
-    proxies:
-      - USD
-      - USA
-    url: "http://www.gstatic.com/generate_204"
-    interval: 300
-    tolerance: 50
+      - EXAMPLE
 
   # AI 服务 (HK IP 被 OpenAI/Claude/Gemini 等屏蔽，强制美国出口)
   - name: AI
     type: select
     proxies:
-      - AUTO-US
-      - USD
-      - USA
+      - EXAMPLE
 
 # ==============================================================
 # 规则提供者 (Loyalsoldier/clash-rules, 每日 6:30 AM 北京时间更新)
