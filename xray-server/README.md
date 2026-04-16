@@ -1,7 +1,7 @@
 # Xray Server-Side Assets
 
 Server-side bits for the Xray install on DMIT LAX. Client routing lives in the
-top-level `config-*.template.yaml` (Mihomo) — this directory only contains
+top-level `clash-*.template.yaml` (Mihomo) — this directory only contains
 things that run on the VPS itself.
 
 ## `routing.json`
@@ -22,7 +22,11 @@ array must provide `direct` (freedom) and `block` (blackhole) tags:
 {
   "outbounds": [
     { "protocol": "vless", "tag": "proxy", "settings": { "...": "..." } },
-    { "protocol": "freedom", "tag": "direct", "settings": { "domainStrategy": "UseIPv4" } },
+    {
+      "protocol": "freedom",
+      "tag": "direct",
+      "settings": { "domainStrategy": "UseIPv4" }
+    },
     { "protocol": "blackhole", "tag": "block" }
   ]
 }
