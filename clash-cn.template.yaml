@@ -1,8 +1,8 @@
 # ==============================================================
-# Mihomo 分流配置 - 香港版
+# Mihomo 分流配置 - 中国大陆版
 # 适用客户端: Clash Verge Rev (macOS) / Stash (iOS)
 # 规则来源: Loyalsoldier/clash-rules (每日自动更新)
-# 策略: 黑名单模式 — 默认直连，仅 AI/手动选择的服务走代理
+# 策略: 白名单模式 — 国内直连，其余走代理
 # ==============================================================
 
 # --- 基础设置 ---
@@ -16,6 +16,9 @@ tcp-concurrent: true
 find-process-mode: strict
 
 # --- GeoData 设置 ---
+# 注意: geodata 在 Mihomo 启动时下载 (先于代理启动)。为保证大陆首次启动
+# 可直连，geox-url 和 rule-providers 统一使用 testingcf.jsdelivr.net 镜像。
+# 如镜像偶发不可用，可先手动下载 .dat 文件放到 ~/.config/clash/ 目录
 geodata-mode: true
 geo-auto-update: true
 geo-update-interval: 24
@@ -25,7 +28,7 @@ geox-url:
   mmdb: "https://testingcf.jsdelivr.net/gh/MetaCubeX/meta-rules-dat@release/country.mmdb"
 
 # --- DNS 配置 ---
-# 香港网络无污染，DNS 配置较简单
+# 大陆需要分流 DNS: 国内域名用国内 DNS，国外域名走加密 DNS
 dns:
   enable: true
   listen: 127.0.0.1:1053
@@ -38,23 +41,41 @@ dns:
     - "*.test"
     - "+.msftncsi.com"
     - "+.msftconnecttest.com"
+    - "+.ntp.org.cn"
     - "+.pool.ntp.org"
     - "time.*.com"
     - "time.*.apple.com"
     - "stun.*.*"
     - "+.stun.*.*"
+    - "localhost.ptlogin2.qq.com"
+    - "+.battlenet.com.cn"
+    - "+.battle.net"
+    - "+.music.163.com"
+    - "+.126.net"
+    - "+.xiami.com"
+    - "+.kuwo.cn"
+    - "+.y.qq.com"
+    - "+.tc.qq.com"
   default-nameserver:
-    - 1.1.1.1
-    - 8.8.8.8
+    - 223.5.5.5
+    - 119.29.29.29
   nameserver:
-    - https://cloudflare-dns.com/dns-query
-    - https://dns.google/dns-query
-  fallback:
     - https://doh.pub/dns-query
     - https://dns.alidns.com/dns-query
+  fallback:
+    - https://dns.google/dns-query
+    - https://cloudflare-dns.com/dns-query
   fallback-filter:
     geoip: true
-    geoip-code: HK
+    geoip-code: CN
+    geosite:
+      - gfw
+    ipcidr:
+      - 240.0.0.0/4
+  nameserver-policy:
+    "geosite:cn,private":
+      - https://doh.pub/dns-query
+      - https://dns.alidns.com/dns-query
 
 # --- Sniffer 流量嗅探 ---
 # 在 fake-ip 模式下从 TLS SNI / HTTP Host / QUIC 中提取真实域名,
@@ -77,9 +98,9 @@ sniffer:
 # ==============================================================
 # 代理节点 (模板)
 # 使用方式:
-#   1. cp config-hk.template.yaml config-hk.yaml
+#   1. cp clash-cn.template.yaml clash-cn.yaml
 #   2. 把下方所有 YOUR_* 占位符替换为真实值
-#   3. config-hk.yaml 已在 .gitignore 中，不会被提交
+#   3. clash-cn.yaml 已在 .gitignore 中，不会被提交
 # ==============================================================
 proxies:
   - name: "EXAMPLE"
@@ -108,7 +129,7 @@ proxy-groups:
     proxies:
       - EXAMPLE
 
-  # AI 服务 (HK IP 被 OpenAI/Claude/Gemini 等屏蔽，强制美国出口)
+  # AI 服务 (OpenAI/Claude/Gemini 对 KR/HK/CN 均不友好，强制美国出口)
   - name: AI
     type: select
     proxies:
@@ -116,6 +137,7 @@ proxy-groups:
 
 # ==============================================================
 # 规则提供者 (Loyalsoldier/clash-rules, 每日 6:30 AM 北京时间更新)
+# 注: rule-providers 在代理启动后拉取，通过代理通道回源，可靠
 # ==============================================================
 rule-providers:
   reject:
@@ -137,6 +159,27 @@ rule-providers:
     behavior: domain
     url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/direct.txt"
     path: ./ruleset/direct.yaml
+    interval: 86400
+
+  proxy:
+    type: http
+    behavior: domain
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/proxy.txt"
+    path: ./ruleset/proxy.yaml
+    interval: 86400
+
+  gfw:
+    type: http
+    behavior: domain
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/gfw.txt"
+    path: ./ruleset/gfw.yaml
+    interval: 86400
+
+  tld-not-cn:
+    type: http
+    behavior: domain
+    url: "https://testingcf.jsdelivr.net/gh/Loyalsoldier/clash-rules@release/tld-not-cn.txt"
+    path: ./ruleset/tld-not-cn.yaml
     interval: 86400
 
   cncidr:
@@ -183,9 +226,7 @@ rule-providers:
 
 # ==============================================================
 # 分流规则
-# 香港默认直连，仅 AI/TikTok 走代理
-# 注: PROXY 组实际上只被 TikTok 规则使用,在 GUI 中切换 PROXY 组的节点
-#     只会影响 TikTok 的出口；AI 走独立的 AI 组 (AUTO-US)
+# 顺序: 局域网 → 广告 → 自定义补丁(AI) → 直连规则集 → 代理规则集 → GeoIP 兜底
 # ==============================================================
 rules:
   # --- 局域网/私有网络 ---
@@ -196,7 +237,7 @@ rules:
   # --- 广告拦截 ---
   - RULE-SET,reject,REJECT
 
-  # --- AI 服务 (HK IP 被 OpenAI/Claude/Gemini 等屏蔽，必须走美国) ---
+  # --- AI 服务 (必须走代理) ---
   # geosite category-ai-!cn 已覆盖: OpenAI/Claude/Gemini/Copilot/Perplexity/
   # Grok/Huggingface/ElevenLabs/Poe/Cursor/Codeium/Cohere/Mistral/Groq 等
   - GEOSITE,category-ai-!cn,AI
@@ -208,22 +249,25 @@ rules:
   - DOMAIN-SUFFIX,runwayml.com,AI
   - DOMAIN-SUFFIX,character.ai,AI
 
-  # --- TikTok (香港/大陆 IP 均被屏蔽) ---
+  # --- TikTok (大陆/香港 IP 均被屏蔽) ---
   - GEOSITE,tiktok,PROXY
 
-  # --- Apple/iCloud 直连 (HK 默认就是直连，显式声明以便统一管理) ---
+  # --- Apple/iCloud 直连 (避免走代理拖慢同步) ---
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
-
-  # --- Telegram 直连 (HK 可直连 Telegram，无需走代理) ---
-  - RULE-SET,telegramcidr,DIRECT,no-resolve
 
   # --- 国内直连 ---
   - RULE-SET,direct,DIRECT
   - RULE-SET,cncidr,DIRECT,no-resolve
 
+  # --- 已知需要代理的域名 ---
+  - RULE-SET,gfw,PROXY
+  - RULE-SET,tld-not-cn,PROXY
+  - RULE-SET,proxy,PROXY
+  - RULE-SET,telegramcidr,PROXY,no-resolve
+
   # --- GeoIP 兜底 ---
   - GEOIP,CN,DIRECT
 
-  # --- 最终规则: 默认直连 (黑名单模式) ---
-  - MATCH,DIRECT
+  # --- 最终规则: 默认走代理 (白名单模式) ---
+  - MATCH,PROXY
