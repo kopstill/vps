@@ -1,4 +1,3 @@
-.DS_Store
 .claude/
 
 # Live configs with real server credentials — use *.template.yaml instead
