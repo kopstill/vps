@@ -49,12 +49,6 @@ dns:
   nameserver:
     - https://cloudflare-dns.com/dns-query
     - https://dns.google/dns-query
-  fallback:
-    - https://doh.pub/dns-query
-    - https://dns.alidns.com/dns-query
-  fallback-filter:
-    geoip: true
-    geoip-code: HK
 
 # --- Sniffer 流量嗅探 ---
 # 在 fake-ip 模式下从 TLS SNI / HTTP Host / QUIC 中提取真实域名,
