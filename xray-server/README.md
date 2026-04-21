@@ -1,6 +1,6 @@
 # Xray Server-Side Assets
 
-Server-side bits for the Xray install on DMIT LAX. Client routing lives in the
+Server-side bits for the Xray install on the VPS. Client routing lives in the
 top-level `clash-*.template.yaml` (Mihomo) — this directory only contains
 things that run on the VPS itself.
 
@@ -9,7 +9,7 @@ things that run on the VPS itself.
 Minimal server-side routing fragment. The client (Mihomo) already decides what
 to proxy, so the server only needs four rules:
 
-1. **`block-bittorrent`** — drop BT traffic so DMIT TOS is not violated.
+1. **`block-bittorrent`** — drop BT traffic so the provider's TOS is not violated.
 2. **`block-ads`** — drop `geosite:category-ads-all` to save outbound bandwidth.
 3. **`block-private-ip`** — refuse `geoip:private` targets so the proxy cannot
    be pivoted into the server's own LAN (defense against RFC1918 probing).
