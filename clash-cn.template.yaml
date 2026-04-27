@@ -256,6 +256,10 @@ rules:
   - RULE-SET,icloud,DIRECT
   - RULE-SET,apple,DIRECT
 
+  # --- Google 强制走代理 (覆盖 direct 规则集中误判的 tools.google.com 等) ---
+  # CN 变体如 *-cn.com 不在 geosite:google 里，仍然走下面的 direct 规则集
+  - GEOSITE,google,PROXY
+
   # --- 国内直连 ---
   - RULE-SET,direct,DIRECT
   - RULE-SET,cncidr,DIRECT,no-resolve
