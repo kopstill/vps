@@ -68,14 +68,15 @@ dns:
   fallback-filter:
     geoip: true
     geoip-code: CN
-    geosite:
-      - gfw
     ipcidr:
       - 240.0.0.0/4
   nameserver-policy:
     "geosite:cn,private":
       - https://doh.pub/dns-query
       - https://dns.alidns.com/dns-query
+    "geosite:gfw":
+      - https://dns.google/dns-query
+      - https://cloudflare-dns.com/dns-query
 
 # --- Sniffer 流量嗅探 ---
 # 在 fake-ip 模式下从 TLS SNI / HTTP Host / QUIC 中提取真实域名,
