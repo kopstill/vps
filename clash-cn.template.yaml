@@ -70,13 +70,12 @@ dns:
     geoip-code: CN
     ipcidr:
       - 240.0.0.0/4
+  # 注: Stash 不支持 geosite:cn,private 这种逗号合并语法，必须拆开
+  # 注: 部分 Stash 版本只接受单个字符串值，不支持数组，这里统一用单字符串
   nameserver-policy:
-    "geosite:cn,private":
-      - https://doh.pub/dns-query
-      - https://dns.alidns.com/dns-query
-    "geosite:gfw":
-      - https://dns.google/dns-query
-      - https://cloudflare-dns.com/dns-query
+    "geosite:cn": https://doh.pub/dns-query
+    "geosite:private": https://doh.pub/dns-query
+    "geosite:gfw": https://dns.google/dns-query
 
 # --- Sniffer 流量嗅探 ---
 # 在 fake-ip 模式下从 TLS SNI / HTTP Host / QUIC 中提取真实域名,
