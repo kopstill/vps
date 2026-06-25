@@ -1,5 +1,5 @@
 .claude/
 
 # Live configs with real server credentials — use *.template.yaml instead
-clash-cn.yaml
-clash-hk.yaml
+CN.yaml
+HK.yaml
