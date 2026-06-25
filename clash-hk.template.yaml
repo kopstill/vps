@@ -150,8 +150,15 @@ rules:
   # --- 广告拦截 ---
   - RULE-SET,reject,REJECT
 
-  # --- AI 服务 (HK IP 被 OpenAI/Claude/Gemini 等屏蔽，必须走美国) ---
-  # geosite category-ai-!cn 已覆盖: OpenAI/Claude/Gemini/Copilot/Perplexity/
+  # --- Gemini/DeepMind/NotebookLM 在 HK 已开放，直连 (必须在 category-ai-!cn 之前命中) ---
+  # geosite:google-deepmind 完整覆盖 Gemini 全家桶：
+  #   gemini.google.com / .gstatic.com / aistudio / makersuite /
+  #   generativelanguage.googleapis.com / 其他 *-pa.googleapis.com /
+  #   bard / notebooklm / jules / labs.google / Gemini Code Assist 等
+  - GEOSITE,google-deepmind,DIRECT
+
+  # --- AI 服务 (HK IP 被 OpenAI/Claude 等屏蔽，必须走美国；Gemini 已上方直连) ---
+  # geosite category-ai-!cn 已覆盖: OpenAI/Claude/Copilot/Perplexity/
   # Grok/Huggingface/ElevenLabs/Poe/Cursor/Codeium/Cohere/Mistral/Groq 等
   - GEOSITE,category-ai-!cn,AI
   # 兜底: geosite 未收录的图像/音频/角色生成 AI
