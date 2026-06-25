@@ -81,7 +81,9 @@ proxies:
     tls: true
     udp: true
     flow: xtls-rprx-vision
-    servername: YOUR_SNI
+    # REALITY SNI 候选 (GFW-safe，不触发针对 apple/icloud 等的封锁):
+    #   addons.mozilla.org  |  download.mozilla.org  |  www.tesla.com
+    servername: addons.mozilla.org
     reality-opts:
       public-key: YOUR_PUBLIC_KEY
       short-id: YOUR_SHORT_ID
